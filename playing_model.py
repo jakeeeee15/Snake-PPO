@@ -3,6 +3,8 @@ from torch import nn
 from torch.nn import Module
 import torch.nn.functional as F
 from torch.distributions import Categorical
+from collections import deque
+import numpy as np
 
 
 class PpoModel(nn.Module):
@@ -48,3 +50,25 @@ class PpoModel(nn.Module):
 
 
 #make the frame stacker
+class FrameStack:
+    def __init__(self):
+        queue = np.zeros((3, 17, 17))
+        self.stack = deque(maxlen=4)
+        for _ in range(4):
+            self.stack.append(queue)
+
+    def add(self, new_frames):
+        self.stack.append(new_frames)
+
+
+    def show_frames(self):
+        for f in self.stack:
+            print(f)
+
+
+if __name__=='__main__':
+    frame_stack = FrameStack()
+    frame_stack.show_frames()
+    print("DONE")
+    frame_stack.add(np.ones((3, 17, 17)))
+    frame_stack.show_frames()
