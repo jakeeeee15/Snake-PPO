@@ -23,11 +23,13 @@ class Food:
 
 
 
-class engine:
-    def __init__(self, height=510, grid_size=30):
+class Engine:
+    def __init__(self, height=510, grid_size=30, model=False):
         self.height = height
         self.grid_size = grid_size
-        self.screen = pygame.display.set_mode((self.height, self.height))
+        self.model=model
+        if not model:
+            self.screen = pygame.display.set_mode((self.height, self.height))
         self.clock = pygame.time.Clock()
         self.snake_x = random.randint(3, 13)
         self.snake_y = random.randint(3, 13)
@@ -39,7 +41,8 @@ class engine:
         self.score=0
 
     def reset(self):
-        self.screen = pygame.display.set_mode((self.height, self.height))
+        if not self.model:
+            self.screen = pygame.display.set_mode((self.height, self.height))
         self.clock = pygame.time.Clock()
         self.snake_x = random.randint(3, 13)
         self.snake_y = random.randint(3, 13)
@@ -85,9 +88,9 @@ class engine:
         else:
             self.snake_queue.popleft()
             if self.snake_queue.count((self.snake_x, self.snake_y)) > 1:
-                print(self.score)
                 reward=-5.0
                 done=True
+                self.reset()
         return reward, done
 
 
@@ -147,57 +150,58 @@ class engine:
 
 
 # --- MAIN LOOP ---
-gamer = engine()
-running = True
+if __name__ == '__main__':
+    gamer = Engine()
+    running = True
 
-move_delay = 120  # You can tweak this base speed
-last_move_time = pygame.time.get_ticks()
+    move_delay = 120  # You can tweak this base speed
+    last_move_time = pygame.time.get_ticks()
 
-state = gamer.get_state()
-gamer.draw_array(state)
+    state = gamer.get_state()
+    gamer.draw_array(state)
 
-done=False
-while running:
-    forced_step = False
+    done=False
+    while running:
+        forced_step = False
 
-    # 1. Catch Inputs
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            action = 0
-            if event.key == pygame.K_LEFT:
-                action = 1
-            elif event.key == pygame.K_RIGHT:
-                action = 2
-            elif event.key == pygame.K_UP:
-                action = 3
-            elif event.key == pygame.K_DOWN:
-                action = 4
+        # 1. Catch Inputs
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                action = 0
+                if event.key == pygame.K_LEFT:
+                    action = 1
+                elif event.key == pygame.K_RIGHT:
+                    action = 2
+                elif event.key == pygame.K_UP:
+                    action = 3
+                elif event.key == pygame.K_DOWN:
+                    action = 4
 
-            if action != 0:
-                # Prevent reversing into itself
-                opposite_dirs = {1: 2, 2: 1, 3: 4, 4: 3}
+                if action != 0:
+                    # Prevent reversing into itself
+                    opposite_dirs = {1: 2, 2: 1, 3: 4, 4: 3}
 
-                # If it's a valid 90-degree turn, snap the snake immediately!
-                if action != gamer.dirn and action != opposite_dirs.get(gamer.dirn, 0):
-                    reward, done = gamer.step(action)
-                    last_move_time = pygame.time.get_ticks()  # Reset the timer
-                    forced_step = True
+                    # If it's a valid 90-degree turn, snap the snake immediately!
+                    if action != gamer.dirn and action != opposite_dirs.get(gamer.dirn, 0):
+                        reward, done = gamer.step(action)
+                        last_move_time = pygame.time.get_ticks()  # Reset the timer
+                        forced_step = True
 
-    # 2. Auto-move on timer (only if we didn't just force a turn this frame)
-    current_time = pygame.time.get_ticks()
-    if not forced_step and current_time - last_move_time >= move_delay:
-        reward, done = gamer.step(0)
-        last_move_time = current_time
+        # 2. Auto-move on timer (only if we didn't just force a turn this frame)
+        current_time = pygame.time.get_ticks()
+        if not forced_step and current_time - last_move_time >= move_delay:
+            reward, done = gamer.step(0)
+            last_move_time = current_time
 
-    # 3. Render
-    if done:
-        print("Game Done")
-        done=False
-        gamer.reset()
-    gamer.draw()
+        # 3. Render
+        if done:
+            print("Game Done")
+            done=False
+            gamer.reset()
+        gamer.draw()
 
 
-pygame.quit()
-sys.exit()
+    pygame.quit()
+    sys.exit()
