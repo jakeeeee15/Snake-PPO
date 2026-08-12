@@ -45,7 +45,7 @@ def make_memory_buffer(engine: Vector_Engine, model: PpoModel, device, active_sc
 
 def update_ppo(model : PpoModel, memory:list[dict], device, optim, GAMMA=0.99, epochs=4, epsilon=0.2):
     returns = []
-    disc_rewards = torch.zeros(16).to(device)
+    disc_rewards = torch.zeros(32).to(device)
     for step in reversed(memory):
         mask = 1.0 - step['dones']
         mask = mask.to(device)
@@ -87,7 +87,7 @@ def update_ppo(model : PpoModel, memory:list[dict], device, optim, GAMMA=0.99, e
             loss_actor = -torch.min(unclipped_loss_cpi, clipped).mean()
             loss_critic = nn.MSELoss()(values.squeeze(), returns_batch)
 
-            loss = loss_actor + 0.5*loss_critic - 0.01*entropy.mean()
+            loss = loss_actor + 0.5*loss_critic - 0.02*entropy.mean()
 
             optim.zero_grad()
             loss.backward()
@@ -105,11 +105,15 @@ if __name__ == '__main__':
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("Device = " + device)
     GENERATIONS = 150000
-    vec_eng = Vector_Engine()
+    NUM_ENV=32
+    vec_eng = Vector_Engine(NUM_ENV)
     model = PpoModel().to(device)
+    # checkpoint = "models/snake_ppo_gen_12900.pth"
+    # model.load_state_dict(torch.load(checkpoint, map_location=device))
+    # print(f"Successfully loaded {checkpoint}! Resuming training...")
     vec_eng.reset()
     opt = torch.optim.Adam(params=model.parameters(), lr=0.0003)
-    active_scores = np.zeros(16)
+    active_scores = np.zeros(NUM_ENV)
     for gen in range(GENERATIONS):
         start_time = time.time()
 
@@ -126,7 +130,7 @@ if __name__ == '__main__':
         else:
             print(f"Gen {gen:04d} | Time: {end_time - start_time:.1f}s | No snakes died this generation.")
 
-        if gen % 500 == 0 and gen > 0:
+        if gen % 300 == 0 and gen > 0:
             torch.save(model.state_dict(), f"models/snake_ppo_gen_{gen}.pth")
             print(f">>> Checkpoint Saved: snake_ppo_gen_{gen}.pth")
 

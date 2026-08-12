@@ -25,7 +25,7 @@ class Vector_Engine:
         stacks =[]
         for i in range(self.num):
             stacks.append(self.stacks[i].stack)
-        return numpy.array(stacks, dtype=numpy.float32).reshape((16, 12, 17, 17))
+        return numpy.array(stacks, dtype=numpy.float32).reshape((self.num, 12, 17, 17))
 
     def add_states(self, states):
         for i in range(self.num):

@@ -39,6 +39,8 @@ class Engine:
         self.dirn = 2
         self.food = Food(self.snake_queue)
         self.score=0
+        self.prev_score=0
+        self.steps_without_food = 0
 
     def reset(self):
         if not self.model:
@@ -52,11 +54,13 @@ class Engine:
             [(self.snake_x - 2, self.snake_y), (self.snake_x - 1, self.snake_y), (self.snake_x, self.snake_y)])
         self.dirn = 2
         self.food = Food(self.snake_queue)
+        self.steps_without_food=0
 
     def step(self, action=0):
         # 0=nothing, 1=left, 2=right, 3=up, 4=down
         done=False
-        reward=-0.01
+        self.steps_without_food+=1
+        reward=-0.02
         if action == 0 or self.dirn == action or (self.dirn == 1 and action == 2) or (
                 self.dirn == 2 and action == 1) or (self.dirn == 3 and action == 4) or (self.dirn == 4 and action == 3):
             if self.dirn == 1:
@@ -83,13 +87,16 @@ class Engine:
         if self.snake_x==self.food.x and self.snake_y==self.food.y:
             self.food = Food(self.snake_queue)
             self.score+=1
-            reward=3.0
+            reward=10.0
             self.snake_length+=1
+            self.steps_without_food=0
         else:
             self.snake_queue.popleft()
-            if self.snake_queue.count((self.snake_x, self.snake_y)) > 1:
-                reward=-5.0
-                done=True
+            starve_limit = 150 + (self.snake_length * 10)
+            if self.snake_queue.count((self.snake_x, self.snake_y)) > 1 or self.steps_without_food > starve_limit:
+                reward = -5.0
+                done = True
+                self.prev_score = self.score
                 self.reset()
         return reward, done
 
@@ -98,7 +105,7 @@ class Engine:
         # 0->nothing 1->snake_body 2->snakehead 3->food
         state = np.zeros((3, 17, 17))
         for (x, y) in self.snake_queue:
-            state[0][x][y] = 1.0
+            state[git 0][x][y] = 1.0
         state[0][self.snake_x][self.snake_y] = 0.0
         state[1][self.snake_x][self.snake_y] = 1.0
         state[2][self.food.x][self.food.y] = 1.0
