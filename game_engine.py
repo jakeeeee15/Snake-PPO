@@ -105,7 +105,7 @@ class Engine:
         # 0->nothing 1->snake_body 2->snakehead 3->food
         state = np.zeros((3, 17, 17))
         for (x, y) in self.snake_queue:
-            state[git 0][x][y] = 1.0
+            state[0][x][y] = 1.0
         state[0][self.snake_x][self.snake_y] = 0.0
         state[1][self.snake_x][self.snake_y] = 1.0
         state[2][self.food.x][self.food.y] = 1.0
