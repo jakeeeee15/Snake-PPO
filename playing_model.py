@@ -20,7 +20,7 @@ class PpoModel(nn.Module):
         self.shared_linear = nn.Linear(flatten_size, 256)
 
         self.actor_hidden = nn.Linear(256, 128)
-        self.actor_out_layer = nn.Linear(128, 5)
+        self.actor_out_layer = nn.Linear(128, 3)
 
         self.critic_hidden = nn.Linear(256, 128)
         self.critic_out_layer = nn.Linear(128, 1)

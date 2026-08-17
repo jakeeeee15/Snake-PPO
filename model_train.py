@@ -108,7 +108,7 @@ if __name__ == '__main__':
     NUM_ENV=32
     vec_eng = Vector_Engine(NUM_ENV)
     model = PpoModel().to(device)
-    # checkpoint = "models/snake_ppo_gen_12900.pth"
+    # checkpoint = "models/snake_ppo_gen_7200.pth"
     # model.load_state_dict(torch.load(checkpoint, map_location=device))
     # print(f"Successfully loaded {checkpoint}! Resuming training...")
     vec_eng.reset()

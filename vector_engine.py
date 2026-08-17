@@ -40,7 +40,7 @@ class Vector_Engine:
         rewards=[]
         dones=[]
         for i in range(self.num):
-            reward, done = self.env[i].step(actions[i])
+            reward, done = self.env[i].model_step(actions[i])
             rewards.append(reward)
             dones.append(done)
             next_state = self.env[i].get_state()
