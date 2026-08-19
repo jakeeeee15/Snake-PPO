@@ -31,7 +31,7 @@ def watch_ai_play():
     model = PpoModel().to(device)
 
     # Change this number to load your target generation!
-    checkpoint_path = "models/snake_ppo_gen_70800.pth"
+    checkpoint_path = "models/snake_ppo_gen_83700.pth"
 
     try:
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))

@@ -108,13 +108,13 @@ if __name__ == '__main__':
     NUM_ENV=32
     vec_eng = Vector_Engine(NUM_ENV)
     model = PpoModel().to(device)
-    # checkpoint = "models/snake_ppo_gen_7200.pth"
-    # model.load_state_dict(torch.load(checkpoint, map_location=device))
-    # print(f"Successfully loaded {checkpoint}! Resuming training...")
+    checkpoint = "models/snake_ppo_gen_54600.pth"
+    model.load_state_dict(torch.load(checkpoint, map_location=device))
+    print(f"Successfully loaded {checkpoint}! Resuming training...")
     vec_eng.reset()
-    opt = torch.optim.Adam(params=model.parameters(), lr=0.0003)
+    opt = torch.optim.Adam(params=model.parameters(), lr=0.00003)
     active_scores = np.zeros(NUM_ENV)
-    for gen in range(GENERATIONS):
+    for gen in range(54600, GENERATIONS):
         start_time = time.time()
 
         memory, active_scores, completed_scores = make_memory_buffer(vec_eng, model, device, active_scores)

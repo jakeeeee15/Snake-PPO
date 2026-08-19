@@ -60,8 +60,9 @@ class Engine:
     def step(self, action=0):
         done = False
         self.steps_without_food += 1
-
-        dist_before = self.get_distance()
+        time_penalty = -0.02 * max(0.0, (30 - self.snake_length) / 30.0)
+        reward = time_penalty
+        # dist_before = self.get_distance()
 
         if action == 0 or self.dirn == action or (self.dirn == 1 and action == 2) or (
                 self.dirn == 2 and action == 1) or (self.dirn == 3 and action == 4) or (self.dirn == 4 and action == 3):
@@ -95,12 +96,12 @@ class Engine:
 
         self.snake_queue.append((self.snake_x, self.snake_y))
 
-        dist_after = self.get_distance()
-
-        if dist_after < dist_before:
-            reward = 0.05
-        else:
-            reward = -0.05
+        # dist_after = self.get_distance()
+        # reward=-0.01
+        # if dist_after < dist_before:
+        #     reward = 0.05
+        # else:
+        #     reward = -0.05
 
         if self.snake_x == self.food.x and self.snake_y == self.food.y:
             self.food = Food(self.snake_queue)
@@ -111,7 +112,10 @@ class Engine:
         else:
             self.snake_queue.popleft()
 
-            if self.snake_queue.count((self.snake_x, self.snake_y)) > 1 or self.steps_without_food > 200:
+            dynamic_starvation_limit = 200 + (self.snake_length * 3)
+
+            if self.snake_queue.count(
+                    (self.snake_x, self.snake_y)) > 1 or self.steps_without_food > dynamic_starvation_limit:
                 reward = -5.0 - (self.snake_length * 0.2)
                 done = True
                 self.prev_score = self.score
